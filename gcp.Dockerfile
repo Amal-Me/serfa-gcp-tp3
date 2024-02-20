@@ -11,10 +11,8 @@ COPY ./vms-sa.json /vms-sa.json
 # this is how Google finds your identity to communicate with the GCP
 ENV GOOGLE_APPLICATION_CREDENTIALS=/vms-sa.json
 
-# copy env.
+# copy env
 COPY .env /.env
-
-
 
 # installing gcloud CLI;
 # the `-y` flag is used for non-interactive mode
@@ -43,11 +41,12 @@ RUN pip install -r /requirements.txt
 # copy the script
 COPY ./gcp-vm.py /gcp-vm.py
 COPY ./startup.sh /startup.sh
+
 # ! dev to run the container indefinitely (better for debugging)
 # CMD ["sh", "-c", "tail -f /dev/null"]
 
 # `ENTRYPOINT` allows me to run the container as an executable,
 # with the parameters I want to pass to the script:
-# `docker run MY_IMAGE param1 param2` =>  `python3 /gcp-vm.py param1 param2`;
+# `docker run MY_IMAGE param1 param2` =>  `python3 /gcp-vm.py {command} {name}`;
 # `CMD` and `ENTRYPOINT` are not executed during the build, only when the container runs
 ENTRYPOINT [ "python3", "/gcp-vm.py" ]
