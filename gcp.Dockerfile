@@ -12,6 +12,7 @@ COPY ./vms-sa.json /vms-sa.json
 ENV GOOGLE_APPLICATION_CREDENTIALS=/vms-sa.json
 
 # copy env
+
 COPY .env /.env
 
 # installing gcloud CLI;
