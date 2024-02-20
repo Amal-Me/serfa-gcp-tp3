@@ -14,7 +14,7 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=/vms-sa.json
 # copy env.
 COPY .env /.env
 
-#COM
+
 
 # installing gcloud CLI;
 # the `-y` flag is used for non-interactive mode
