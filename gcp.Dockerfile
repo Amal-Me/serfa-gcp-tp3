@@ -11,8 +11,7 @@ COPY ./vms-sa.json /vms-sa.json
 # this is how Google finds your identity to communicate with the GCP
 ENV GOOGLE_APPLICATION_CREDENTIALS=/vms-sa.json
 
-# copy env
-
+# copy env.
 COPY .env /.env
 
 # installing gcloud CLI;
