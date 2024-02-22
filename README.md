@@ -64,6 +64,8 @@ script everything with Docker
 ... the goal is to do all these steps with a simple docker run IMAGE... command.
 
 docker build --build-arg PROJECT_NAME=markets-agent --build-arg SERVICE_ACCOUNT_EMAIL=vms-sa@markets-agent.iam.gserviceaccount.com -t gcp-vm .
+
+But before moving on with the next step, here is a diagram showing this process:
 CI/CD deployment
 
 Most of the Apache servers host your website files under /var/www.
@@ -103,6 +105,8 @@ scp test.txt USER@IP:/var/www/html => this copies the the file inside the VM's /
 The first time you'll run this, you will encounter a permissions issue: it's because your VM user doesn't own the folder in which Apache stores the website files. You can verify this by running ls -l /var/www inside the VM. To be able to copy files within the VM, you'll need, inside the VM, to: sudo chown USER -R /var/www/html.
 
 Now if you copy again the file and go to http://IP/test.txt you should see the content of the file.
+
+Here is a diagram showing all the manual steps:
 
 Ok, now let's update our site with a pipeline !
 automate the process
@@ -164,16 +168,17 @@ deploy like in 2024
     change the contents of the html folder in your repo
     check that the changes have been reflected on the Internet after the action has run
 
+Here is the diagram showing the process =>
 spec out the app's features: what does the app' do?
 
 It's an app' to manage tickets.
 
-    CRUD tickets
-    CRUD users
     a ticket is a the description of a problem or a task
     a ticket can be opened, closed
     a ticket can have comments
     a ticket has a resolution
+    CRUD (Create Read Update Delete) tickets
+    CRUD users
     there are permissions in the application:
         CRUD-related permissions
         close a ticket
@@ -192,6 +197,7 @@ What views/pages do we need ?
     login page
     home => lists all tickets
         ability to delete a ticket
+        priority of tickets
         status labels of the tickets
         ticket assignement button
     registration page
@@ -202,6 +208,7 @@ What views/pages do we need ?
         edit form for the ticket
         field for resolution of ticket
         label for ticket status
+        priority of tickets
         ticket assignement button
     ticket creation page
     users admin page:
@@ -222,4 +229,83 @@ Each ticket row has:
 - ability to delete a ticket
 - status labels of the tickets
 - ticket assignement button
+
+the swag part
+
+We have generated favicons and added them to our project.
+moving on to 3-tier architecture ?
+
+Now we want to:
+
+    display the list of tickets dynamically (from a database)
+    restrict who can access the database directly => 3-tier architecture
+
+3-tier architecture
+
+... finally we don't do that and we use a simplified version of this architecture using a Firebase instance, which means we only have two tiers: the frontend and the database.
+initiate a Firebase project
+
+    go to the Firebase and create your project attached to your GCP project
+    copy the HTML snippet into your code (with the correct keys)
+    verify that everything loads (Firebase + favicons) locally
+    deploy online and verify
+
+now, let's us a Firebase realtime database
+
+    we need to compile Javascript modular code so that the browser understands it
+    we need an intermediary step to push the Firebase code to the browser => we are going to use for Node.JS for this
+    we don't want to install Node.JS on our local machine, so we are going to use Docker for this
+    we create a Docker image which runs forever
+    we are going to do Node.JS operations inside the container
+    with a volume, all our changes will be reflected in our repo
+
+Try this out ! run the Node.JS Docker Compose service, create a file inside the container under the /app folder, see it in your local machine.
+becoming badass Javascript developers
+
+    npm init from the dockerized Node.JS Docker Compose service
+    this created a package.json file, which contains the list of all the JS dependencies (libraries) of our project
+    we 've installed firebase and webpack with npm install from within our Node container
+
+    firebase is the Node.JS version of the previous code we have put in our HTML
+    webpack is the library that will help us translate the Node.JS code into something the browser can understand
+
+... these can be installed with npm install firebase webpack webpack-cli
+
+    we moved the Firebase code from the frontend folder html to the src folder: this is the code that will be compiled by Webpack
+    the guidelines of how to compile the code are specified in the webpack.config.js file + we've added a script to compile the in our package.json file
+
+"scripts": {
+  "build": "webpack --mode=development"
+}
+
+... now we can run npm run build and see the bundled code appear in html/javascript/firebase-bundle.js !
+
+    we rebuilt our Docker app' image
+    we checked in the browser if the database error has disappeared, and it has !
+
+trying Firebase locally
+
+    for testing, we want to write something to Firebase every time the page is loaded
+    we use a development branch (we don't want to push the code online)
+    we run docker compose watch:
+        we can access the nodejs container at all times
+        every time we run npm run build, the site is updated
+
+... even if we follow the docs, we don't seem to be able to communicate with our Firebase instance, that's a shame, moving to another technology since the goal of selecting Firebase was to go faster.
+
+What we keep from this experience is the Javascript bundling code and our development environment.
+chosing a SQL database
+
+We select the default choice because of its popularity and its ease of use: PostgreSQL.
+
+We need 2 more components:
+
+    a web API
+    a database
+
+Let's start with the web API.
+starting to route traffic via a PHP index entrypoint
+
+    we managed to route traffic to a PHP file using a PHP Apache conf locally using the php:apache Docker image
+    now, if we want that to work on the remote, we need to install PHP in the VM in the CI/CD pipeline
 
