@@ -44,6 +44,7 @@ jobs:
           sudo rm -rf ./conf
           sudo a2enmod rewrite
           sudo a2enmod headers
+          sudo apt-get install php 
           sudo systemctl restart apache2
 
   update-application:
