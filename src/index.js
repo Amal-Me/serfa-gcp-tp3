@@ -20,6 +20,7 @@ const firebaseConfig = {
 // initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+//com
 
 // initialize database
 const database = getDatabase(app);
